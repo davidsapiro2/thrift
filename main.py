@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine
-from .crud import create_item, get_items, get_item
+from .crud import create_item, get_all, get_one
 from . import schemas
 from . import models
 
@@ -21,7 +21,7 @@ def get_db():
 def get_all_items(db: Session = Depends(get_db)):
     """Returns list of all items"""
 
-    items = get_items(db=db)
+    items = get_all(db=db, model=models.Item)
     return items
 
 @app.post("/items", response_model=schemas.Item)
@@ -35,7 +35,7 @@ def add_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
 def get_one_item(item_id: int, db: Session = Depends(get_db)):
     """Returns details of one item"""
 
-    item = get_item(item_id=item_id, db=db)
+    item = get_one(db=db, model=models.Item, id=item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
     return item
